@@ -22,7 +22,7 @@ TABLE_NAME = 'homework.test_table_zharau'
 
 SQL_QUERY = f"""
     CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
-        id INTEGER PRIMARY KEY,
+        id INTEGER,
         value TEXT
     );
 """
@@ -61,7 +61,8 @@ def load_data_to_postgres(**kwargs):
                 records = 0
                 for row in reader:
                     cursor.execute(
-                        f"INSERT INTO {TABLE_NAME} (id, value) VALUES (%s, %s)",
+                        f"""INSERT INTO {TABLE_NAME} (id, value) 
+                        VALUES (%s, %s)""",
                         (int(row[0]), row[1]),
                     )
                     records += 1
