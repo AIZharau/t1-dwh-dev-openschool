@@ -150,3 +150,4 @@ DISTRIBUTED REPLICATED;
 - **`fact_transactions`** содержит только ключи измерений и меры, что упрощает агрегации.
 - **Суррогатные ключи** (`analytic_account_key`, `organization_key` и т.д.) улучшают производительность JOIN-ов и защищают от изменений в исходных данных.
 
+![er-diagram](https://github.com/AIZharau/t1-dwh-dev-openschool/blob/main/Practice_5_GP_database_query/image/ER-model-star-t1-project.drawio.png)
