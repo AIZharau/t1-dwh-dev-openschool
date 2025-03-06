@@ -22,22 +22,25 @@
     - `transaction_count` (количество транзакций, если требуется агрегация).
   - **Связи с измерениями**:
     - `analytic_account_key` → `dim_analytic_accounts`.
-    - `date_key` → `dim_date` (для анализа по времени).
+    - `transaction_date`.
     - `transaction_type_key` → `dim_transaction_types`.
+    -  `created_at`,   `updated_at`.
 
 ```sql
 CREATE TABLE fact_transactions (
     transaction_id bigint,
     analytic_account_key int,
-    date_key int,
+    transaction_date date NOT NULL,
     transaction_type_key int,
     amount numeric(15,2),
     transaction_count int
+    created_at timestamp DEFAULT current_timestamp,
+	  updated_at timestamp DEFAULT current_timestamp
 )
 WITH (APPENDONLY=true, ORIENTATION=column, COMPRESSTYPE=zstd)
 DISTRIBUTED BY (analytic_account_key)
 PARTITION BY RANGE (date_key) 
-(START (20240101) END (20250101) EVERY (INTERVAL '1 month'));;
+(START (20240101) END (20250101) EVERY (INTERVAL '1 month'));
 ```
 
 ---
@@ -119,31 +122,6 @@ PARTITION BY RANGE (date_key)
    DISTRIBUTED BY (transaction_type_key);
    ```
 
-5. **``dim_date`** (таблица измерения времени):
-   - **Поля**:
-     - `date_key` (суррогатный ключформат: YYYYMMDD).
-     - `full_date` (Дата в формате DATE (например, '2024-01-01')).
-     - `description`, 
-     - `day`, `month`, `quarter`, `year` (в виде чисел).
-     - `day_name`, `month_name`, (названия).
-     - `is_weekend`, `is_holiday` (Признаки выходной иди праздник - true/false)
-     - `fiscal_period` (фискальный период организации (например, 'FY2024-Q1'))
-
-```SQL
-CREATE TABLE dim_date (
-    date_key int PRIMARY KEY,
-    full_date date NOT NULL,
-    day int NOT NULL,
-    month int NOT NULL,
-    quarter int NOT NULL,
-    year int NOT NULL,
-    day_name varchar(9) NOT NULL,
-    month_name varchar(9) NOT NULL,
-    is_weekend boolean NOT NULL,
-    is_holiday boolean NOT NULL,
-    fiscal_period varchar(10) 
-)
-DISTRIBUTED REPLICATED;
 ```
 ### **Почему денормализация:**
 - **`dim_analytic_accounts`** включает поля из `organizations` и `synthetic_accounts`, чтобы избежать JOIN-ов при анализе счетов.
