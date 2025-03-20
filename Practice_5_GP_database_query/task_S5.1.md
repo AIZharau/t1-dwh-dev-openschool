@@ -65,7 +65,7 @@ PARTITION BY RANGE (date_key)
        created_at timestamp,
        updated_at timestamp
    )
-   DISTRIBUTED BY (analytic_account_key);
+   DISTRIBUTED REPLICATED;
    ```
 
 2. **`dim_organizations`** (на базе `organizations`):
@@ -85,7 +85,7 @@ PARTITION BY RANGE (date_key)
        created_at timestamp,
        updated_at timestamp
    )
-   DISTRIBUTED BY (organization_key);
+   DISTRIBUTED REPLICATED;
    ```
 
 3. **`dim_synthetic_accounts`** (на базе `synthetic_accounts`):
@@ -104,7 +104,7 @@ PARTITION BY RANGE (date_key)
        created_at timestamp,
        updated_at timestamp
    )
-   DISTRIBUTED BY (synthetic_account_key);
+   DISTRIBUTED REPLICATED;
    ```
 
 4. **`dim_transaction_types`** (справочник типов транзакций):
@@ -119,11 +119,12 @@ PARTITION BY RANGE (date_key)
        transaction_type varchar(255),
        description varchar(255)
    )
-   DISTRIBUTED BY (transaction_type_key);
+   DISTRIBUTED REPLICATED;
    ```
 
-```
-### **Почему денормализация:**
+---
+
+####  **Почему денормализация:**
 - **`dim_analytic_accounts`** включает поля из `organizations` и `synthetic_accounts`, чтобы избежать JOIN-ов при анализе счетов.
 - **`fact_transactions`** содержит только ключи измерений и меры, что упрощает агрегации.
 - **Суррогатные ключи** (`analytic_account_key`, `organization_key` и т.д.) улучшают производительность JOIN-ов и защищают от изменений в исходных данных.
